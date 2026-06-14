@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="uz" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WearFlow — Omborchi Paneli</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+    <!-- Navigatsiya -->
+    <nav class="bg-slate-900 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                </div>
+                <span class="text-white font-bold text-lg">WearFlow Logistics</span>
+                <span class="bg-green-600 text-white text-xs font-medium px-2 py-1 rounded-full ml-2">OMBORCHI</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-slate-300 text-sm">
+                    Xush kelibsiz, <span th:text="${loginUser.username}" class="text-white font-medium"></span>
+                </span>
+                <a th:href="@{/chiqish}"
+                   class="bg-slate-700 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-lg transition">
+                    Chiqish
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+
+        <!-- Sahifa sarlavhasi -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-slate-800">Ombor Boshqaruvi</h1>
+            <p class="text-slate-500 mt-1">Mahsulotlar miqdorini yangilang</p>
+        </div>
+
+        <!-- Mahsulotlar jadvali + Yangilash formasi -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-slate-800">Mahsulotlar Ro'yxati</h2>
+                <span class="text-sm text-slate-500">
+                    Jami: <span th:text="${#lists.size(mahsulotlar)}" class="font-semibold text-slate-700"></span> ta
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">#</th>
+                            <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">Mahsulot Nomi</th>
+                            <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">Hozirgi Miqdor</th>
+                            <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">Ombor</th>
+                            <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">Yangi Miqdor Kiriting</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+
+                        <tr th:each="mahsulot : ${mahsulotlar}" class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4 text-sm text-slate-400" th:text="${mahsulot.id}"></td>
+
+                            <td class="px-6 py-4">
+                                <span class="text-sm font-medium text-slate-800"
+                                      th:text="${mahsulot.mahsulotNomi}"></span>
+                            </td>
+
+                            <td class="px-6 py-4">
+                                <!-- Miqdorga qarab rang o'zgaradi -->
+                                <span th:classappend="${mahsulot.miqdori > 10} ? 'text-green-600' : (${mahsulot.miqdori > 0} ? 'text-yellow-600' : 'text-red-600')"
+                                      class="text-sm font-bold"
+                                      th:text="${mahsulot.miqdori} + ' dona'"></span>
+                            </td>
+
+                            <td class="px-6 py-4">
+                                <span class="bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full"
+                                      th:text="${mahsulot.omborTuri}"></span>
+                            </td>
+
+                            <!-- Har bir qator uchun alohida yangilash formasi -->
+                            <td class="px-6 py-4">
+                                <form th:action="@{/user/update}" method="post"
+                                      class="flex items-center gap-2">
+                                    <!-- Qaysi mahsulot ekanini aniqlash uchun yashirin maydon -->
+                                    <input type="hidden" name="id" th:value="${mahsulot.id}">
+
+                                    <!-- Yangi miqdorni kiritish maydoni -->
+                                    <input type="number"
+                                           name="yangiMiqdor"
+                                           min="0"
+                                           th:placeholder="${mahsulot.miqdori}"
+                                           required
+                                           class="w-24 border border-slate-300 rounded-lg px-3 py-2 text-sm
+                                                  focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+
+                                    <!-- Saqlash tugmasi -->
+                                    <button type="submit"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium
+                                                   px-4 py-2 rounded-lg transition whitespace-nowrap">
+                                        Saqlash
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(mahsulotlar)}">
+                            <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                                Hozircha mahsulotlar mavjud emas
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Eslatma -->
+        <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+            <p class="text-sm text-blue-700">
+                💡 <strong>Eslatma:</strong> Miqdorni yangilash uchun yangi raqam kiriting va "Saqlash" tugmasini bosing.
+            </p>
+        </div>
+
+    </div>
+</body>
+</html>
